@@ -30,7 +30,7 @@ fi
 case $install_ubuntu in
   [yY][eE][sS])
     wget --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz \
-      "https://cdn.kvm-i7.host/ubuntu-base-22.04.4-base-${ARCH_ALT}.tar.gz"
+      "https://cdn.kvm-i7.host/ubuntu-base-22.04.2-base-${ARCH_ALT}.tar.gz"
     tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR
     ;;
   *)
