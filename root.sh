@@ -1,21 +1,24 @@
 #!/bin/sh
 
 ROOTFS_DIR=$(pwd)
+RAM_DIR="$ROOTFS_DIR/ram"
 export PATH=$PATH:~/.local/usr/bin
 max_retries=50
 timeout=1
 ARCH=$(uname -m)
 
-if [ "$ARCH" = "x86_64" ]; then
-  ARCH_ALT=amd64
-elif [ "$ARCH" = "aarch64" ]; then
-  ARCH_ALT=arm64
-else
-  printf "Unsupported CPU architecture: ${ARCH}"
-  exit 1
-fi
+case "$ARCH" in
+  x86_64) ARCH_ALT=amd64 ;;
+  aarch64) ARCH_ALT=arm64 ;;
+  *)
+    echo "Unsupported CPU architecture: ${ARCH}"
+    exit 1
+    ;;
+esac
 
-if [ ! -e $ROOTFS_DIR/.installed ]; then
+mkdir -p "$RAM_DIR"
+
+if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   echo "███████╗██████╗ ███████╗███████╗██████╗  ██████╗  ██████╗ ████████╗
 ██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝
 █████╗  ██████╔╝█████╗  █████╗  ██████╔╝██║   ██║██║   ██║   ██║   
@@ -29,44 +32,46 @@ fi
 
 case $install_ubuntu in
   [yY][eE][sS])
-    wget --tries=$max_retries --timeout=$timeout --no-hsts -O /tmp/rootfs.tar.gz \
+    ROOTFS_TAR="$RAM_DIR/rootfs.tar.gz"
+    wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$ROOTFS_TAR" \
       "https://cdn.kvm-i7.host/ubuntu-base-22.04.2-base-${ARCH_ALT}.tar.gz"
-    tar -xf /tmp/rootfs.tar.gz -C $ROOTFS_DIR
+
+    if [ $? -ne 0 ] || [ ! -s "$ROOTFS_TAR" ]; then
+      echo "Download failed or file is empty. Exiting."
+      exit 1
+    fi
+
+    tar -xf "$ROOTFS_TAR" -C "$ROOTFS_DIR"
+    if [ $? -ne 0 ]; then
+      echo "Extraction failed. Exiting."
+      exit 1
+    fi
     ;;
   *)
     echo "Skipping Ubuntu installation."
     ;;
 esac
 
-if [ ! -e $ROOTFS_DIR/.installed ]; then
-  mkdir $ROOTFS_DIR/usr/local/bin -p
-  wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
+if [ ! -e "$ROOTFS_DIR/.installed" ]; then
+  mkdir -p "$ROOTFS_DIR/usr/local/bin"
+  PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
+  wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
+    "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
 
-  while [ ! -s "$ROOTFS_DIR/usr/local/bin/proot" ]; do
-    rm $ROOTFS_DIR/usr/local/bin/proot -rf
-    wget --tries=$max_retries --timeout=$timeout --no-hsts -O $ROOTFS_DIR/usr/local/bin/proot "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
+  if [ $? -ne 0 ] || [ ! -s "$PROOT_BIN" ]; then
+    echo "proot download failed or file is empty. Exiting."
+    exit 1
+  fi
 
-    if [ -s "$ROOTFS_DIR/usr/local/bin/proot" ]; then
-      chmod 755 $ROOTFS_DIR/usr/local/bin/proot
-      break
-    fi
-
-    chmod 755 $ROOTFS_DIR/usr/local/bin/proot
-    sleep 1
-  done
-
-  chmod 755 $ROOTFS_DIR/usr/local/bin/proot
+  chmod 755 "$PROOT_BIN"
 fi
 
-if [ ! -e $ROOTFS_DIR/.installed ]; then
-  printf "nameserver 1.1.1.1\nnameserver 1.0.0.1" > ${ROOTFS_DIR}/etc/resolv.conf
-  rm -rf /tmp/rootfs.tar.xz /tmp/sbin
-  touch $ROOTFS_DIR/.installed
+if [ ! -e "$ROOTFS_DIR/.installed" ]; then
+  echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > "${ROOTFS_DIR}/etc/resolv.conf"
+  touch "$ROOTFS_DIR/.installed"
 fi
 
 CYAN='\e[0;36m'
-WHITE='\e[0;37m'
-
 RESET_COLOR='\e[0m'
 
 display_gg() {
@@ -75,8 +80,9 @@ display_gg() {
   echo -e ""
 }
 
+clear
 display_gg
 
-$ROOTFS_DIR/usr/local/bin/proot \
+"$PROOT_BIN" \
   --rootfs="${ROOTFS_DIR}" \
-  -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit
+  -0 -w "/root" -b /dev -b /sys -b /proc -b /etc/resolv.conf --kill-on-exit /bin/sh
