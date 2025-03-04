@@ -14,7 +14,7 @@ This shell script is designed to automate the installation of Linux, a lightweig
 1. Clone the repository:
 
     ```sh
-    git clone https://github.com/katy-the-kat/ubuntu22.04freeroot.git
+    git clone https://github.com/katy-the-kat/freeroot.git
     cd freeroot
     ```
 
