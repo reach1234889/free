@@ -24,7 +24,7 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
 █████╗  ██████╔╝█████╗  █████╗  ██████╔╝██║   ██║██║   ██║   ██║   
 ██╔══╝  ██╔══██╗██╔══╝  ██╔══╝  ██╔══██╗██║   ██║██║   ██║   ██║   
 ██║     ██║  ██║███████╗███████╗██║  ██║╚██████╔╝╚██████╔╝   ██║   
-╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   
+╚═╝     ╚═╝  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   
                                                                    "
   echo "Fork - Made by KVM-i7"
   read -p "Do you want to install Ubuntu? (YES/no): " install_ubuntu
@@ -32,15 +32,22 @@ fi
 
 case $install_ubuntu in
   [yY][eE][sS])
-    ROOTFS_TAR="$RAM_DIR/rootfs.tar.gz"
-    wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$ROOTFS_TAR" \
-      "https://cdn.kvm-i7.host/ubuntu-base-22.04.2-base-${ARCH_ALT}.tar.gz"
+    ROOTFS_TAR="$ROOTFS_DIR/${ARCH_ALT}.tar.gz"
 
-    if [ $? -ne 0 ] || [ ! -s "$ROOTFS_TAR" ]; then
-      echo "Download failed or file is empty. Exiting."
-      exit 1
+    if [ -f "$ROOTFS_TAR" ]; then
+      echo "Found local tar file: $ROOTFS_TAR"
+    else
+      echo "Local file not found. Downloading ${ARCH_ALT}.tar.gz..."
+      wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$ROOTFS_TAR" \
+        "https://cdn.kvm-i7.host/ubuntu-base-22.04.2-base-${ARCH_ALT}.tar.gz"
+
+      if [ $? -ne 0 ] || [ ! -s "$ROOTFS_TAR" ]; then
+        echo "Download failed or file is empty. Exiting."
+        exit 1
+      fi
     fi
 
+    echo "Extracting $ROOTFS_TAR..."
     tar -xf "$ROOTFS_TAR" -C "$ROOTFS_DIR"
     if [ $? -ne 0 ]; then
       echo "Extraction failed. Exiting."
@@ -55,6 +62,8 @@ esac
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   mkdir -p "$ROOTFS_DIR/usr/local/bin"
   PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
+  
+  echo "Downloading proot binary..."
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
     "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
 
