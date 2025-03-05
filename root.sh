@@ -61,7 +61,7 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   if [ -f "proot-${ARCH}" ]; then
     echo "----------------------------"
     echo "Found local binary."
-    mv proot-${ARCH} $ROOTFS_DIR/usr/local/bin
+    mv proot-${ARCH} $ROOTFS_DIR/usr/local/bin/proot
   else
     echo "Did not find binary, Downloading binary."
     wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
@@ -76,9 +76,9 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
 fi
 
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
-  echo "----------------------------"
   echo -e "nameserver 1.1.1.1\nnameserver 1.0.0.1" > "${ROOTFS_DIR}/etc/resolv.conf"
   touch "$ROOTFS_DIR/.installed"
+  echo "----------------------------"
 fi
 
 display_gg() {
