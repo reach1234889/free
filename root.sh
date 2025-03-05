@@ -29,7 +29,7 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
 fi
 
 case $install_ubuntu in
-  [yY][eE][sS])
+  yes|y)
     ROOTFS_TAR="$ROOTFS_DIR/${ARCH_ALT}.tar.gz"
     if [ -f "$ROOTFS_TAR" ]; then
       echo "----------------------------"
