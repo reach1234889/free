@@ -58,9 +58,10 @@ esac
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   mkdir -p "$ROOTFS_DIR/usr/local/bin"
   PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
-  if [ -f "$PROOT_BIN" ]; then
+  if [ -f "proot-${ARCH}" ]; then
     echo "----------------------------"
     echo "Found local binary."
+    mv proot-${ARCH} $ROOTFS_DIR/usr/local/bin
   else
     echo "Did not find binary, Downloading binary."
     wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
