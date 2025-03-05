@@ -62,6 +62,7 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
     echo "----------------------------"
     echo "Found local binary."
     mv proot-${ARCH} $ROOTFS_DIR/usr/local/bin/proot
+    chmod +x $ROOTFS_DIR/usr/local/bin/proot
   else
     echo "Did not find binary, Downloading binary."
     wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
