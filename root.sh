@@ -2,6 +2,7 @@
 
 ROOTFS_DIR=$(pwd)
 RAM_DIR="$ROOTFS_DIR/ram"
+PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
 export PATH=$PATH:~/.local/usr/bin
 max_retries=50
 timeout=1
@@ -45,14 +46,13 @@ case $install_ubuntu in
     fi
     ;;
   *)
-    echo "Skipping Ubuntu installation."
     ;;
 esac
 
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   mkdir -p "$ROOTFS_DIR/usr/local/bin"
   PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
-  echo "Downloading proot binary..."
+  echo "Downloading binary..."
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
     "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
 
@@ -68,9 +68,6 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   touch "$ROOTFS_DIR/.installed"
 fi
 
-CYAN='\e[0;36m'
-RESET_COLOR='\e[0m'
-
 display_gg() {
   echo -e "
          ______               _____            ____________  ____________ __
@@ -78,7 +75,6 @@ ____  ____  /_____  __________  /____  __    __|__ \_|__ \ __  __ \_  // /
 _  / / /_  __ \  / / /_  __ \  __/  / / /    ____/ /___/ / _  / / /  // /_
 / /_/ /_  /_/ / /_/ /_  / / / /_ / /_/ /     _  __/_  __/__/ /_/ //__  __/
 \__,_/ /_.___/\__,_/ /_/ /_/\__/ \__,_/      /____//____/(_)____/   /_/   
-                                                                          
                                                                           "
   echo -e "boot complete."
 }
