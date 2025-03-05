@@ -37,7 +37,7 @@ case $install_ubuntu in
     else
       echo "Local file not found. Downloading ${ARCH_ALT}.tar.gz..."
       wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$ROOTFS_TAR" \
-        "https://cdn.kvm-i7.host/ubuntu-base-22.04.2-base-${ARCH_ALT}.tar.gz"
+        "https://github.com/katy-the-kat/freeroot/raw/refs/heads/main/${ARCH_ALT}.tar.gz"
 
       if [ $? -ne 0 ] || [ ! -s "$ROOTFS_TAR" ]; then
         echo "Download failed or file is empty. Exiting."
