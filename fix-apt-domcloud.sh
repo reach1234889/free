@@ -1,0 +1,10 @@
+echo "deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy main restricted
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-updates main restricted
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy universe
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-updates universe
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy multiverse
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-updates multiverse
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-backports main restricted universe multiverse
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-security universe
+deb [trusted=yes] http://ports.ubuntu.com/ubuntu-ports/ jammy-security multiverse" > /etc/apt/sources.list
