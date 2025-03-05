@@ -19,21 +19,12 @@ esac
 mkdir -p "$RAM_DIR"
 
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
-  echo "███████╗██████╗ ███████╗███████╗██████╗  ██████╗  ██████╗ ████████╗
-██╔════╝██╔══██╗██╔════╝██╔════╝██╔══██╗██╔═══██╗██╔═══██╗╚══██╔══╝
-█████╗  ██████╔╝█████╗  █████╗  ██████╔╝██║   ██║██║   ██║   ██║   
-██╔══╝  ██╔══██╗██╔══╝  ██╔══╝  ██╔══██╗██║   ██║██║   ██║   ██║   
-██║     ██║  ██║███████╗███████╗██║  ██║╚██████╔╝╚██████╔╝   ██║   
-╚═╝     ╚═╝  ╚══════╝╚══════╝╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   
-                                                                   "
-  echo "Fork - Made by KVM-i7"
-  read -p "Do you want to install Ubuntu? (YES/no): " install_ubuntu
+  read -p "Do you want to install Ubuntu 22.04? (y/n): " install_ubuntu
 fi
 
 case $install_ubuntu in
   [yY][eE][sS])
     ROOTFS_TAR="$ROOTFS_DIR/${ARCH_ALT}.tar.gz"
-
     if [ -f "$ROOTFS_TAR" ]; then
       echo "Found local tar file: $ROOTFS_TAR"
     else
@@ -46,7 +37,6 @@ case $install_ubuntu in
         exit 1
       fi
     fi
-
     echo "Extracting $ROOTFS_TAR..."
     tar -xf "$ROOTFS_TAR" -C "$ROOTFS_DIR"
     if [ $? -ne 0 ]; then
@@ -62,7 +52,6 @@ esac
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   mkdir -p "$ROOTFS_DIR/usr/local/bin"
   PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
-  
   echo "Downloading proot binary..."
   wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
     "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
@@ -71,7 +60,6 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
     echo "proot download failed or file is empty. Exiting."
     exit 1
   fi
-
   chmod 755 "$PROOT_BIN"
 fi
 
@@ -84,12 +72,17 @@ CYAN='\e[0;36m'
 RESET_COLOR='\e[0m'
 
 display_gg() {
-  echo -e ""
-  echo -e "           ${CYAN}-----> Complete <----${RESET_COLOR}"
-  echo -e ""
+  echo -e "
+         ______               _____            ____________  ____________ __
+____  ____  /_____  __________  /____  __    __|__ \_|__ \ __  __ \_  // /
+_  / / /_  __ \  / / /_  __ \  __/  / / /    ____/ /___/ / _  / / /  // /_
+/ /_/ /_  /_/ / /_/ /_  / / / /_ / /_/ /     _  __/_  __/__/ /_/ //__  __/
+\__,_/ /_.___/\__,_/ /_/ /_/\__/ \__,_/      /____//____/(_)____/   /_/   
+                                                                          
+                                                                          "
+  echo -e "boot complete."
 }
 
-clear
 display_gg
 
 "$PROOT_BIN" \
