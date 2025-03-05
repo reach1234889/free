@@ -52,15 +52,19 @@ esac
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
   mkdir -p "$ROOTFS_DIR/usr/local/bin"
   PROOT_BIN="$ROOTFS_DIR/usr/local/bin/proot"
-  echo "Downloading binary..."
-  wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
-    "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
+  if [ -f "$PROOT_BIN" ]; then
+    echo "Found local proot binary: $PROOT_BIN"
+  else
+    echo "Downloading proot binary..."
+    wget --tries=$max_retries --timeout=$timeout --no-hsts -O "$PROOT_BIN" \
+      "https://raw.githubusercontent.com/katy-the-kat/freeroot/main/proot-${ARCH}"
 
-  if [ $? -ne 0 ] || [ ! -s "$PROOT_BIN" ]; then
-    echo "proot download failed or file is empty. Exiting."
-    exit 1
+    if [ $? -ne 0 ] || [ ! -s "$PROOT_BIN" ]; then
+      echo "proot download failed or file is empty. Exiting."
+      exit 1
+    fi
+    chmod 755 "$PROOT_BIN"
   fi
-  chmod 755 "$PROOT_BIN"
 fi
 
 if [ ! -e "$ROOTFS_DIR/.installed" ]; then
@@ -69,14 +73,13 @@ if [ ! -e "$ROOTFS_DIR/.installed" ]; then
 fi
 
 display_gg() {
-  echo -e "
-         ______               _____            ____________  ____________ __
+  echo -e "         ______               _____            ____________  ____________ __
 ____  ____  /_____  __________  /____  __    __|__ \_|__ \ __  __ \_  // /
 _  / / /_  __ \  / / /_  __ \  __/  / / /    ____/ /___/ / _  / / /  // /_
 / /_/ /_  /_/ / /_/ /_  / / / /_ / /_/ /     _  __/_  __/__/ /_/ //__  __/
 \__,_/ /_.___/\__,_/ /_/ /_/\__/ \__,_/      /____//____/(_)____/   /_/   
                                                                           "
-  echo -e "boot complete."
+  echo -e "Shell started, Do whatever you want! Make sure to join discord.gg/kvm!"
 }
 
 display_gg
